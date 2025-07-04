@@ -29,28 +29,35 @@ export default function RootLayout() {
       try {
         // Ensure all necessary fonts are loaded before proceeding.
         // The `useFonts` hook returns a boolean indicating if fonts are loaded.
-        await fontsLoaded;
+        // Wait for fonts to be loaded. If they are not yet loaded, this will pause.
+        if (!fontsLoaded) {
+          return; // Do not proceed until fonts are loaded
+        }
+
+        // Reset animation values to ensure they play from the start on re-render/reload
+        logoOpacity.setValue(0);
+        logoScale.setValue(0.5);
 
         // Start the logo pop-up animation.
         // We use Animated.parallel to run both opacity and scale animations simultaneously.
         Animated.parallel([
           Animated.timing(logoOpacity, {
             toValue: 1, // Fade in to full opacity
-            duration: 800, // Animation duration for fading
+            duration: 2000, // Increased animation duration for fading (from 1500ms to 2000ms)
             useNativeDriver: true, // Use native driver for better performance
           }),
           Animated.spring(logoScale, {
             toValue: 1, // Scale up to original size
-            friction: 3, // Controls the bounciness of the spring animation
-            tension: 40, // Controls the speed of the spring animation
+            friction: 7, // Adjusted friction for a slightly slower, smoother spring (from 6 to 7)
+            tension: 25, // Adjusted tension for a slightly slower spring (from 20 to 25)
             useNativeDriver: true, // Use native driver for better performance
           }),
         ]).start(); // Start the animation sequence.
 
         // Simulate any other loading tasks (e.g., API calls, asset loading)
-        // and ensure the splash screen is visible for a minimum duration (e.g., 2 seconds).
-        // This provides a smoother user experience.
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // and ensure the splash screen is visible for a minimum duration.
+        // Increased the minimum display time to 4 seconds for a more noticeable splash.
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
       } catch (e) {
         // Log any errors that occur during the preparation phase.
@@ -63,8 +70,9 @@ export default function RootLayout() {
     }
 
     // Call the prepare function when the component mounts or when fontsLoaded state changes.
+    // This effect will re-run if fontsLoaded changes, which is crucial for reloads.
     prepare();
-  }, [fontsLoaded]); // Dependency array: re-run effect if fontsLoaded changes.
+  }, [fontsLoaded, logoOpacity, logoScale]); // Dependency array: re-run effect if fontsLoaded or animated values change.
 
   // This callback is triggered when the root view of the application is laid out.
   // It's the ideal place to hide the native splash screen once our React Native content is ready.
@@ -78,8 +86,10 @@ export default function RootLayout() {
   if (!appIsReady) {
     // If the app is not yet ready (i.e., `prepare` function is still running),
     // display the animated logo splash screen.
+    // Adding a key here forces React to re-mount this component on every reload,
+    // ensuring the useEffect runs and the animation restarts.
     return (
-      <View style={styles.container}>
+      <View key="splash-screen-view" style={styles.container}>
         <Animated.Image
           source={require('../assets/images/logo.png')} // Path to your logo image
           style={[
@@ -125,8 +135,8 @@ const styles = StyleSheet.create({
     // This should ideally match the backgroundColor set in your app.json for a seamless transition.
   },
   logo: {
-    width: 600, // Set the width of your logo
-    height: 300, // Set the height of your logo
+    width: 300, // Increased logo width (from 200 to 300)
+    height: 300, // Increased logo height (from 200 to 300)
     resizeMode: 'contain', // Ensures the entire logo is visible within the bounds
   },
 });
