@@ -3,15 +3,15 @@ import { FontAwesome } from '@expo/vector-icons'; // For the checkmark icon
 import { useRouter } from 'expo-router'; // Import useRouter for navigation
 import React, { useState } from 'react';
 import {
-    Dimensions,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Dimensions,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -23,10 +23,10 @@ export default function LoginPage() {
   const router = useRouter(); // Initialize router for navigation
 
   const handleLogin = () => {
-    // Implement login logic here
-    console.log('Login Pressed');
-    console.log({ username, password, rememberMe });
-    // On successful login, you might navigate to your main app (e.g., router.replace('/(tabs)'))
+    // For testing purposes, redirect directly to the tabs without input validation.
+    // In a real app, you would implement your authentication logic here.
+    console.log('Login Pressed - Redirecting to dashboard for testing.');
+    router.replace('/(tabs)'); // Redirect to the tabs group (which will default to index.tsx)
   };
 
   const handleGoogleSignIn = () => {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
   },
- logo: {
+  logo: {
     width: width * 1.45, // **Logo width increased**
     height: height * 0.35, // **Logo height increased**
     marginBottom: height * -0.06,
